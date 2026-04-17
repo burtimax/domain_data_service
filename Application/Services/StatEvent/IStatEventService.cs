@@ -4,5 +4,5 @@ namespace Application.Services.StatEvent;
 
 public interface IStatEventService
 {
-    Task<StatEventEntity> CreateStatEventAsync(long userId, long sessionId, string? utm, string? type, CancellationToken ct = default);
+    Task<StatEventEntity> CreateStatEventAsync(string? type, CancellationToken ct = default);
 }

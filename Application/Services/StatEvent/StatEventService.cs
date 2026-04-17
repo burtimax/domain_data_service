@@ -13,13 +13,10 @@ public class StatEventService : IStatEventService
     }
 
 
-    public async Task<StatEventEntity> CreateStatEventAsync(long userId, long sessionId, string? utm, string? type, CancellationToken ct = default)
+    public async Task<StatEventEntity> CreateStatEventAsync(string? type, CancellationToken ct = default)
     {
         var statEvent = new StatEventEntity
         {
-            SessionId = sessionId,
-            Utm = utm ?? "",
-            UserId = userId,
             Type = (type ?? "").Substring(0, Math.Min(type?.Length ?? 0, 30))
         };
 

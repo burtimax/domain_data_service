@@ -1,10 +1,4 @@
-﻿using System.Text;
-using Api.Extensions;
-using Application.Extensions;
-using Application.Utils;
-using FastEndpoints;
-using Microsoft.EntityFrameworkCore;
-using Shared.Const;
+﻿using FastEndpoints;
 using Shared.Contracts;
 namespace Api.Middleware;
 

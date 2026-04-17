@@ -1,8 +1,8 @@
 ﻿using System.Linq.Expressions;
-using Infrastructure.Db.App.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Query;
+using Infrastructure.Db.App.Entities;
 using Shared.Extensions;
 
 namespace Infrastructure.Db.App;
@@ -43,7 +43,6 @@ public partial class AppDbContext
     private void SetSchemasToTables(ModelBuilder builder)
     {
         // Определение сущностей по схемам.
-        builder.Entity<UserEntity>().ToTable("users", Infrastructure.Db.App.AppDbContext.appSchema);
         builder.Entity<StatEventEntity>().ToTable("stat_events", Infrastructure.Db.App.AppDbContext.appSchema);
     }
 

@@ -7,10 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="FastEndpoints.Security" Version="5.35.0" />
       <PackageReference Include="Mapster" Version="7.4.0" />
       <PackageReference Include="Mapster.DependencyInjection" Version="1.0.1" />
-      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.4" />
       <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.4" />
       <PackageReference Include="WTelegramBot" Version="9.0.1" />
       <PackageReference Include="WTelegramClient" Version="4.3.4" />
@@ -20,6 +18,10 @@
       <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
       <ProjectReference Include="..\SharedServices\SharedServices.csproj" />
       <ProjectReference Include="..\Shared\Shared.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Configs\" />
     </ItemGroup>
 
 </Project>

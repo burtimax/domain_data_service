@@ -1,9 +1,7 @@
 ﻿using System;
 using Application.Extensions;
-using Application.Services.Authentication;
 using Application.Services.SMSGateway;
 using Application.Services.Test;
-using Application.Services.User;
 using Infrastructure.Db.App;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -43,10 +41,7 @@ public static class IServiceCollectionExtensions
 
     public static void AddServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddJwt(configuration);
         services.AddScoped<ITestService, TestService>();
-        services.AddScoped<IAuthenticationService, AuthenticationService>();
-        services.AddScoped<IUserService, UserService>();
         services.AddScoped<ISMSGatewayService, SMSGatewayService>();
     }
 

@@ -18,12 +18,6 @@ public class AppConstants
     /// </summary>
     public const string PrivateChatLinkFormat = "tg://user?id={0}";
 
-    public class UserRoles
-    {
-        public const string Admin = "admin";
-        public const string User = "user";
-    }
-
     public class Cultures
     {
         public static CultureInfo Ru = new CultureInfo("ru-RU");
@@ -39,5 +33,4 @@ public class AppConstants
         public const string VerificationCodeStatusSuccess = "code_valid";
     }
 
-    public const long UndefinedTelegramId = -1;
 }

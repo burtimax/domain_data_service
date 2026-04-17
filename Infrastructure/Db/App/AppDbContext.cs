@@ -1,5 +1,5 @@
-﻿using Infrastructure.Db.App.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Infrastructure.Db.App.Entities;
 
 namespace Infrastructure.Db.App;
 
@@ -27,7 +27,6 @@ public partial class AppDbContext : DbContext
     }
 
     // Коллекции данных
-    public DbSet<UserEntity> Users => Set<UserEntity>();
     public DbSet<StatEventEntity> StatEvents => Set<StatEventEntity>();
 
     protected override void OnModelCreating(ModelBuilder builder)

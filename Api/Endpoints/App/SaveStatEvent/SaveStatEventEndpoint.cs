@@ -1,7 +1,5 @@
-using Api.Extensions;
 using Application.Services.StatEvent;
 using FastEndpoints;
-using Infrastructure.Db.App;
 using Infrastructure.Db.App.Entities;
 using Shared.Contracts;
 
@@ -32,11 +30,7 @@ sealed class SaveStatEventEndpoint : Endpoint<SaveStatEventRequest, Result<StatE
 
     public override async Task HandleAsync(SaveStatEventRequest req, CancellationToken ct)
     {
-        var sessionId = HttpContext.TokenData().SessionId;
-        var utm = HttpContext.TokenData().Utm;
-        var userId = HttpContext.TokenData().UserId;
-
-        var statEvent = await _statEventService.CreateStatEventAsync(userId, sessionId, utm, req.Type, ct);
+        var statEvent = await _statEventService.CreateStatEventAsync(req.Type, ct);
 
         await SendAsync(new Result<StatEventEntity>(statEvent), cancellation: ct);
     }

@@ -3,7 +3,6 @@ using Api.Extensions;
 using Api.Middleware;
 using Application.Extensions;
 using FastEndpoints;
-using FastEndpoints.Security;
 using FastEndpoints.Swagger;
 using Infrastructure.Db.App;
 
@@ -97,10 +96,6 @@ app.UseCors(builder =>
                .AllowCredentials();
     }
 });
-
-// Подключение аутентификации и авторизации
-app.UseAuthentication();
-app.UseAuthorization();
 
 // Мидлвар статистики по запросам.
 app.UseMiddleware<StatRequestMiddleware>();
