@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Application.Services.Ingestion;
 using Mapster;
 using MapsterMapper;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,6 +8,12 @@ namespace Application.Extensions;
 
 public static class IServiceCollectionExtensions
 {
+    public static void AddApplicationServices(this IServiceCollection services)
+    {
+        services.AddScoped<IObservationIngestionHandler, ObservationIngestionHandler>();
+        services.AddSingleton<IngestionMetrics>();
+    }
+
     public static void AddMapster(this IServiceCollection services)
     {
         var config = TypeAdapterConfig.GlobalSettings;

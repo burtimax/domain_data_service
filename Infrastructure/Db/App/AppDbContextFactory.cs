@@ -1,4 +1,23 @@
-﻿// using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
+
+namespace Infrastructure.Db.App;
+
+public sealed class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
+{
+    public AppDbContext CreateDbContext(string[] args)
+    {
+        var connectionString =
+            Environment.GetEnvironmentVariable("APP_DB_CONNECTION")
+            ?? "Host=localhost;Port=5432;Database=domain_parser;Username=postgres;Password=postgres";
+
+        var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
+        optionsBuilder.UseNpgsql(connectionString);
+
+        return new AppDbContext(optionsBuilder.Options);
+    }
+}
+// using Microsoft.EntityFrameworkCore;
 // using Microsoft.EntityFrameworkCore.Design;
 //
 // namespace Infrastructure.Db.App;

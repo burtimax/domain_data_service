@@ -90,6 +90,21 @@ public partial class AppDbContext
         builder.Entity<SourcePlatformEntity>(entity =>
         {
             entity.HasIndex(x => x.Code).IsUnique();
+            entity.HasData(
+                new SourcePlatformEntity
+                {
+                    Id = 1,
+                    Code = "nicksell",
+                    Name = "NickSell",
+                    CreatedAt = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero),
+                },
+                new SourcePlatformEntity
+                {
+                    Id = 2,
+                    Code = "godaddy",
+                    Name = "GoDaddy",
+                    CreatedAt = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero),
+                });
         });
 
         builder.Entity<AuctionEntity>(entity =>

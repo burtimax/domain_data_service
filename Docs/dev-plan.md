@@ -107,9 +107,9 @@
 - [ ] Подготовить тест-набор IDN кейсов.
 
 ### 3.5 Миграции
-- [ ] Сформировать миграции EF Core.
-- [ ] Проверить применение миграций при старте (`Api/Program.cs`) и локально через команды.
-- [ ] Обновить `Infrastructure/migration_commands.md`.
+- [x] Сформировать миграции EF Core.
+- [!] Проверить применение миграций при старте (`Api/Program.cs`) и локально через команды (локальный `dotnet ef database update` упирается в `28P01` на текущих credentials `postgres`; автоприменение на старте оставлено через `db.Database.Migrate()`).
+- [x] Обновить `Infrastructure/migration_commands.md`.
 
 **DoD эпика:** receiver-схема БД полностью описана и применима миграциями.
 
@@ -120,18 +120,18 @@
 **Зависимость:** Epic 2 и Epic 3.
 
 ### 4.1 RabbitMQ integration
-- [ ] Описать топологию exchange/queue/routing key для observation.
-- [ ] Реализовать consumer с manual ack.
-- [ ] Реализовать поведение nack/requeue/dlq для разных классов ошибок.
+- [x] Описать топологию exchange/queue/routing key для observation.
+- [x] Реализовать consumer с manual ack.
+- [x] Реализовать поведение nack/requeue/dlq для разных классов ошибок.
 
 ### 4.2 Вариант HTTP ingestion (если нужен в MVP)
-- [ ] Реализовать endpoint приёма observation в `Api`.
-- [ ] Сделать идентичную валидацию контракта как в queue flow.
-- [ ] Ограничить endpoint как internal-only.
+- [!] Реализовать endpoint приёма observation в `Api` (отложено: в текущем MVP включён только RabbitMQ ingest, HTTP канал не активирован).
+- [!] Сделать идентичную валидацию контракта как в queue flow (валидатор реализован в общем `Application` use-case, endpoint не включён).
+- [!] Ограничить endpoint как internal-only (применимо после включения HTTP ingest).
 
 ### 4.3 Общий ingestion слой
-- [ ] Унифицировать входные модели из queue/http в единый `Application` use-case.
-- [ ] Добавить метрики по входящему потоку.
+- [x] Унифицировать входные модели из queue/http в единый `Application` use-case.
+- [x] Добавить метрики по входящему потоку.
 
 **DoD эпика:** сообщения стабильно попадают в receiver pipeline и корректно подтверждаются/отклоняются.
 

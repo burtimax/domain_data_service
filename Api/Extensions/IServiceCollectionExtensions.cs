@@ -1,5 +1,9 @@
 ﻿using System;
+using Api.BackgroundServices;
+using Application.Extensions;
+using Application.Services.StatEvent;
 using Infrastructure.Db.App;
+using Infrastructure.Db.App.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,8 +16,10 @@ public static class IServiceCollectionExtensions
 {
     public static void AddServices(this IServiceCollection services, IConfiguration configuration)
     {
-        // Receiver-only composition root: legacy bot/sms сервисы не регистрируются.
-        _ = configuration;
+        // Receiver-only composition root.
+        services.AddScoped<IStatEventService, StatEventService>();
+        services.AddApplicationServices();
+        services.AddHostedService<RabbitMqObservationConsumerService>();
     }
 
     public static AppConfiguration AddConfigurations(this IServiceCollection services, IConfiguration configuration)
@@ -42,6 +48,21 @@ public static class IServiceCollectionExtensions
 
         if (string.IsNullOrWhiteSpace(config.RabbitMq.ObservationQueue))
             throw new InvalidOperationException("Configuration.RabbitMq.ObservationQueue is required.");
+
+        if (string.IsNullOrWhiteSpace(config.RabbitMq.ObservationExchange))
+            throw new InvalidOperationException("Configuration.RabbitMq.ObservationExchange is required.");
+
+        if (string.IsNullOrWhiteSpace(config.RabbitMq.ObservationRoutingKey))
+            throw new InvalidOperationException("Configuration.RabbitMq.ObservationRoutingKey is required.");
+
+        if (string.IsNullOrWhiteSpace(config.RabbitMq.DlqExchange))
+            throw new InvalidOperationException("Configuration.RabbitMq.DlqExchange is required.");
+
+        if (string.IsNullOrWhiteSpace(config.RabbitMq.DlqQueue))
+            throw new InvalidOperationException("Configuration.RabbitMq.DlqQueue is required.");
+
+        if (string.IsNullOrWhiteSpace(config.RabbitMq.DlqRoutingKey))
+            throw new InvalidOperationException("Configuration.RabbitMq.DlqRoutingKey is required.");
     }
 
     /// <summary>
