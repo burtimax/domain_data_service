@@ -2,5 +2,5 @@
 
 public class DatabaseAppConfiguration
 {
-    public string AppDbConnection { get; set; }
+    public string AppDbConnection { get; set; } = string.Empty;
 }

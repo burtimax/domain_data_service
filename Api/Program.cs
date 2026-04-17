@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using Api.Extensions;
 using Api.Middleware;
 using Application.Extensions;
@@ -63,22 +65,20 @@ using (var scope = app.Services.CreateScope())
     db.Database.Migrate();
 }
 
-// Настройка конвейера обработки HTTP-запросов
+// Единый middleware исключений нужен во всех окружениях.
+app.UseMiddleware<ResponseExceptionMiddleware>();
+
+// OpenAPI документация доступна только в режиме разработки
 if (app.Environment.IsDevelopment())
 {
-    // OpenAPI документация доступна только в режиме разработки
     app.MapOpenApi();
-}
-else
-{
-    // В production используем middleware для обработки исключений
-    app.UseMiddleware<ResponseExceptionMiddleware>();
 }
 
 // Настройка CORS политики
 app.UseCors(builder =>
 {
-    if (app.Environment.IsDevelopment())
+    var allowedOrigins = config.Receiver.AllowedOrigins;
+    if (app.Environment.IsDevelopment() && allowedOrigins.Length == 0)
     {
         // В разработке разрешаем все источники для удобства
         builder.AllowAnyOrigin()
@@ -87,14 +87,25 @@ app.UseCors(builder =>
     }
     else
     {
-        // ВАЖНО: В production используются только разрешённые домены из конфигурации
-        builder.WithOrigins(
-                   app.Configuration["AllowedOrigins"]?.Split(',')
-                   ?? throw new InvalidOperationException("AllowedOrigins не настроен в конфигурации"))
+        // В non-dev и при явно заданных origin используем whitelist.
+        builder.WithOrigins(allowedOrigins)
                .AllowAnyMethod()
                .AllowAnyHeader()
                .AllowCredentials();
     }
+});
+
+app.Use(async (context, next) =>
+{
+    var messageId = context.Request.Headers["X-Message-Id"].ToString();
+    var traceId = Activity.Current?.TraceId.ToString() ?? context.TraceIdentifier;
+    using var _ = app.Logger.BeginScope(new Dictionary<string, object?>
+    {
+        ["TraceId"] = traceId,
+        ["MessageId"] = string.IsNullOrWhiteSpace(messageId) ? null : messageId,
+    });
+
+    await next();
 });
 
 // Мидлвар статистики по запросам.

@@ -2,7 +2,8 @@
 
 public class AppConfiguration
 {
-    public string WebAppUrl { get; set; }
-    public DatabaseAppConfiguration Database { get; set; }
-    public SmsGatewayConfiguration SMSGateway { get; set; }
+    public string WebAppUrl { get; set; } = string.Empty;
+    public DatabaseAppConfiguration Database { get; set; } = new();
+    public ReceiverConfiguration Receiver { get; set; } = new();
+    public RabbitMqConfiguration RabbitMq { get; set; } = new();
 }

@@ -1,7 +1,4 @@
 ﻿using System;
-using Application.Extensions;
-using Application.Services.SMSGateway;
-using Application.Services.Test;
 using Infrastructure.Db.App;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -13,44 +10,38 @@ namespace Api.Extensions;
 
 public static class IServiceCollectionExtensions
 {
-    // /// <summary>
-    // /// Добавить маппер в DI.
-    // /// </summary>
-    // /// <param name="services"></param>
-    // public static void AddMapster(this IServiceCollection services)
-    // {
-    //     var config = TypeAdapterConfig.GlobalSettings;
-    //     config.Scan(
-    //         Assembly.GetExecutingAssembly());
-    //     config.RequireExplicitMapping = false;
-    //     config.RequireDestinationMemberSource = false;
-    //
-    //     config.When((srcType, destType, _) => true)
-    //         .IgnoreNullValues(true);
-    //
-    //     config
-    //         .When((srcType, destType, _) => srcType == typeof(IBaseBotEntityWithoutIdentity) == false && destType == typeof(IBaseBotEntityWithoutIdentity))
-    //         .Ignore("Id",
-    //             nameof(IBaseBotEntityWithoutIdentity.CreatedAt),
-    //             nameof(IBaseBotEntityWithoutIdentity.UpdatedAt),
-    //             nameof(IBaseBotEntityWithoutIdentity.DeletedAt));
-    //
-    //     var mapperConfig = new Mapper(config);
-    //     services.AddSingleton<IMapper>(mapperConfig);
-    // }
-
     public static void AddServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddScoped<ITestService, TestService>();
-        services.AddScoped<ISMSGatewayService, SMSGatewayService>();
+        // Receiver-only composition root: legacy bot/sms сервисы не регистрируются.
+        _ = configuration;
     }
 
     public static AppConfiguration AddConfigurations(this IServiceCollection services, IConfiguration configuration)
     {
-        AppConfiguration config = configuration.Get<AppConfiguration>();
-        if(config == null) throw new NullReferenceException(nameof(config));
+        AppConfiguration? config = configuration.Get<AppConfiguration>();
+        if (config is null) throw new NullReferenceException(nameof(config));
+
+        ValidateConfiguration(config);
         services.AddSingleton(config);
         return config;
+    }
+
+    private static void ValidateConfiguration(AppConfiguration config)
+    {
+        if (string.IsNullOrWhiteSpace(config.Database.AppDbConnection))
+            throw new InvalidOperationException("Configuration.Database.AppDbConnection is required.");
+
+        if (config.Receiver.MaxAcceptedClockSkewMinutes <= 0)
+            throw new InvalidOperationException("Configuration.Receiver.MaxAcceptedClockSkewMinutes must be greater than 0.");
+
+        if (string.IsNullOrWhiteSpace(config.RabbitMq.Host))
+            throw new InvalidOperationException("Configuration.RabbitMq.Host is required.");
+
+        if (config.RabbitMq.Port <= 0)
+            throw new InvalidOperationException("Configuration.RabbitMq.Port must be greater than 0.");
+
+        if (string.IsNullOrWhiteSpace(config.RabbitMq.ObservationQueue))
+            throw new InvalidOperationException("Configuration.RabbitMq.ObservationQueue is required.");
     }
 
     /// <summary>
