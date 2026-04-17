@@ -24,13 +24,16 @@ public sealed class ObservationIngestionHandler : IObservationIngestionHandler
 
     private readonly AppDbContext _dbContext;
     private readonly ILogger<ObservationIngestionHandler> _logger;
+    private readonly IngestionMetrics _metrics;
 
     public ObservationIngestionHandler(
         AppDbContext dbContext,
-        ILogger<ObservationIngestionHandler> logger)
+        ILogger<ObservationIngestionHandler> logger,
+        IngestionMetrics metrics)
     {
         _dbContext = dbContext;
         _logger = logger;
+        _metrics = metrics;
     }
 
     public async Task HandleAsync(
@@ -49,6 +52,7 @@ public sealed class ObservationIngestionHandler : IObservationIngestionHandler
         if (isDuplicate)
         {
             _logger.LogInformation("Duplicate ingestion message skipped: {MessageId}", normalized.MessageId);
+            _metrics.IncrementDuplicates();
             await SaveProcessingLog(normalized, source, "DUPLICATE_MESSAGE_ID", "Message already processed.", cancellationToken);
             return;
         }
@@ -60,6 +64,7 @@ public sealed class ObservationIngestionHandler : IObservationIngestionHandler
         var semanticDuplicate = await IsSemanticDuplicateAsync(normalized, auction.Id, cancellationToken);
         if (semanticDuplicate)
         {
+            _metrics.IncrementDuplicates();
             await SaveProcessingLog(normalized, source, "SEMANTIC_DUPLICATE", "Semantic duplicate in dedupe window.", cancellationToken);
             return;
         }
@@ -122,6 +127,15 @@ public sealed class ObservationIngestionHandler : IObservationIngestionHandler
             shouldUpdateSnapshot ? "PROCESSED" : "OUT_OF_ORDER_IGNORED",
             shouldUpdateSnapshot ? null : "Snapshot was not updated because message is stale and weaker.",
             cancellationToken);
+
+        _logger.LogInformation(
+            "Ingestion pipeline processed message. messageId={MessageId}, auctionId={AuctionId}, source={Source}, outOfOrder={OutOfOrder}, snapshotUpdated={SnapshotUpdated}, status={Status}",
+            normalized.MessageId,
+            auction.Id,
+            source,
+            isOutOfOrder,
+            shouldUpdateSnapshot,
+            normalized.AuctionStatusNormalized);
     }
 
     private async Task<SourcePlatformEntity> GetOrCreateSourcePlatform(

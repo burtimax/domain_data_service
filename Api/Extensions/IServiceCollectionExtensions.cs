@@ -1,5 +1,6 @@
 ﻿using System;
 using Api.BackgroundServices;
+using Api.Services;
 using Application.Extensions;
 using Application.Services.StatEvent;
 using Infrastructure.Db.App;
@@ -20,6 +21,8 @@ public static class IServiceCollectionExtensions
         // Receiver-only composition root.
         services.AddScoped<IStatEventService, StatEventService>();
         services.AddScoped<IReceiverReadRepository, ReceiverReadRepository>();
+        services.AddSingleton<IFailedMessageArchiveStore, FailedMessageArchiveStore>();
+        services.AddSingleton<IRabbitMqOpsService, RabbitMqOpsService>();
         services.AddApplicationServices();
         services.AddHostedService<RabbitMqObservationConsumerService>();
     }
@@ -65,6 +68,18 @@ public static class IServiceCollectionExtensions
 
         if (string.IsNullOrWhiteSpace(config.RabbitMq.DlqRoutingKey))
             throw new InvalidOperationException("Configuration.RabbitMq.DlqRoutingKey is required.");
+
+        if (config.RabbitMq.MaxRetryAttempts < 0)
+            throw new InvalidOperationException("Configuration.RabbitMq.MaxRetryAttempts must be greater than or equal to 0.");
+
+        if (config.RabbitMq.ReplayBatchSizeDefault <= 0)
+            throw new InvalidOperationException("Configuration.RabbitMq.ReplayBatchSizeDefault must be greater than 0.");
+
+        if (config.RabbitMq.ReplayBatchSizeMax < config.RabbitMq.ReplayBatchSizeDefault)
+            throw new InvalidOperationException("Configuration.RabbitMq.ReplayBatchSizeMax must be greater than or equal to ReplayBatchSizeDefault.");
+
+        if (string.IsNullOrWhiteSpace(config.RabbitMq.DlqArchiveFilePath))
+            throw new InvalidOperationException("Configuration.RabbitMq.DlqArchiveFilePath is required.");
     }
 
     /// <summary>

@@ -3,6 +3,10 @@ namespace Shared.Configs;
 public class RabbitMqConfiguration
 {
     public bool EnableConsumer { get; set; } = true;
+    public int MaxRetryAttempts { get; set; } = 3;
+    public int ReplayBatchSizeDefault { get; set; } = 50;
+    public int ReplayBatchSizeMax { get; set; } = 500;
+    public string DlqArchiveFilePath { get; set; } = "App_Data/dlq-archive.ndjson";
     public string Host { get; set; } = string.Empty;
     public int Port { get; set; } = 5672;
     public string VirtualHost { get; set; } = "/";

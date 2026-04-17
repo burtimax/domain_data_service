@@ -199,22 +199,22 @@
 **Зависимость:** Epic 5 и Epic 6.
 
 ### 7.1 Наблюдаемость
-- [ ] Метрики: throughput, duplicates, processing lag, failed count.
-- [ ] Логи по шагам pipeline.
-- [ ] Корреляция ошибок с `MessageId`.
+- [x] Метрики: throughput, duplicates, processing lag, failed count.
+- [x] Логи по шагам pipeline.
+- [x] Корреляция ошибок с `MessageId`.
 
 ### 7.2 Ошибки и recovery
-- [ ] Ретраи для transient ошибок.
-- [ ] Политика обработки poison messages.
-- [ ] Процедура replay из DLQ/архива.
+- [x] Ретраи для transient ошибок.
+- [x] Политика обработки poison messages.
+- [x] Процедура replay из DLQ/архива.
 
 ### 7.3 Data retention и backup
-- [ ] Утвердить retention для raw/logs/processing log.
-- [ ] Настроить backup и smoke restore.
+- [x] Утвердить retention для raw/logs/processing log.
+- [!] Настроить backup и smoke restore (требуется внешняя инфраструктурная настройка расписания backup/restore-job вне кода приложения; процедура и критерии smoke-restore описаны в `Docs/receiver-runbook.md`).
 
 ### 7.4 Эксплуатационные инструкции
-- [ ] Runbook инцидентов receiver-сервиса.
-- [ ] Инструкция подключения нового upstream producer без изменений parser-кода в этом репо.
+- [x] Runbook инцидентов receiver-сервиса.
+- [x] Инструкция подключения нового upstream producer без изменений parser-кода в этом репо.
 
 **DoD эпика:** receiver готов к эксплуатации в MVP режиме.
 
