@@ -44,6 +44,12 @@ public partial class AppDbContext
     {
         // Определение сущностей по схемам.
         builder.Entity<StatEventEntity>().ToTable("stat_events", Infrastructure.Db.App.AppDbContext.appSchema);
+        builder.Entity<DomainEntity>().ToTable("domains", Infrastructure.Db.App.AppDbContext.appSchema);
+        builder.Entity<SourcePlatformEntity>().ToTable("source_platforms", Infrastructure.Db.App.AppDbContext.appSchema);
+        builder.Entity<AuctionEntity>().ToTable("auctions", Infrastructure.Db.App.AppDbContext.appSchema);
+        builder.Entity<AuctionObservationEntity>().ToTable("auction_observations", Infrastructure.Db.App.AppDbContext.appSchema);
+        builder.Entity<AuctionStatusHistoryEntity>().ToTable("auction_status_history", Infrastructure.Db.App.AppDbContext.appSchema);
+        builder.Entity<ReceiverProcessingLogEntity>().ToTable("receiver_processing_logs", Infrastructure.Db.App.AppDbContext.appSchema);
     }
 
     /// <summary>
@@ -75,19 +81,71 @@ public partial class AppDbContext
 
     public static void ConfigureEntities(ModelBuilder builder)
     {
-        // var jsonSerializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.General);
-        //
-        // builder.Entity<SOME_ENTITY>(entity =>
-        // {
-        //     entity
-        //         .Property(x => x.ContentItem)
-        //         .HasColumnName("PROPERTY")
-        //         .HasColumnType("JSONB")
-        //         .HasConversion(
-        //             ctp => JsonSerializer.Serialize(ctp, jsonSerializerOptions),
-        //             cfp => JsonSerializer.Deserialize<PROPERTY_TYPE>(cfp, jsonSerializerOptions),
-        //             ValueComparer.CreateDefault(typeof(PROPERTY_TYPE), true)
-        //         );
-        // });
+        builder.Entity<DomainEntity>(entity =>
+        {
+            entity.HasIndex(x => x.NameNormalized).IsUnique();
+            entity.HasIndex(x => x.NamePunycode);
+        });
+
+        builder.Entity<SourcePlatformEntity>(entity =>
+        {
+            entity.HasIndex(x => x.Code).IsUnique();
+        });
+
+        builder.Entity<AuctionEntity>(entity =>
+        {
+            entity.Property(x => x.CurrentPrice).HasPrecision(18, 4);
+            entity.Property(x => x.FinalPrice).HasPrecision(18, 4);
+
+            entity.HasIndex(x => new { x.SourcePlatformId, x.ExternalAuctionId }).IsUnique();
+            entity.HasIndex(x => x.Status);
+            entity.HasIndex(x => x.EndAt);
+            entity.HasIndex(x => x.LastObservedAt);
+
+            entity.HasOne(x => x.Domain)
+                .WithMany(x => x.Auctions)
+                .HasForeignKey(x => x.DomainId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(x => x.SourcePlatform)
+                .WithMany(x => x.Auctions)
+                .HasForeignKey(x => x.SourcePlatformId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        builder.Entity<AuctionObservationEntity>(entity =>
+        {
+            entity.Property(x => x.CurrentPrice).HasPrecision(18, 4);
+            entity.Property(x => x.FinalPrice).HasPrecision(18, 4);
+            entity.Property(x => x.RawPayload).HasColumnType("jsonb");
+            entity.Property(x => x.AttributesJson).HasColumnType("jsonb");
+
+            entity.HasIndex(x => x.MessageId).IsUnique();
+            entity.HasIndex(x => x.ObservedAt);
+            entity.HasIndex(x => new { x.AuctionId, x.ObservedAt });
+
+            entity.HasOne(x => x.Auction)
+                .WithMany(x => x.Observations)
+                .HasForeignKey(x => x.AuctionId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<AuctionStatusHistoryEntity>(entity =>
+        {
+            entity.HasIndex(x => new { x.AuctionId, x.ObservedAt });
+            entity.HasIndex(x => new { x.AuctionId, x.NewStatus });
+
+            entity.HasOne(x => x.Auction)
+                .WithMany(x => x.StatusHistory)
+                .HasForeignKey(x => x.AuctionId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<ReceiverProcessingLogEntity>(entity =>
+        {
+            entity.HasIndex(x => x.MessageId);
+            entity.HasIndex(x => x.ProcessedAt);
+            entity.HasIndex(x => new { x.SourcePlatformCode, x.ExternalAuctionId });
+        });
     }
 }

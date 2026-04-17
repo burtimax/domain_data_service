@@ -88,22 +88,22 @@
 **Зависимость:** Epic 2.
 
 ### 3.1 Модель данных receiver-домена
-- [ ] Спроектировать и утвердить ER-модель сущностей: `Domain`, `SourcePlatform`, `Auction`, `AuctionObservation`, `AuctionStatusHistory`, `ReceiverProcessingLog`.
-- [ ] Утвердить опциональность `DomainPriceHistory` для MVP.
+- [x] Спроектировать и утвердить ER-модель сущностей: `Domain`, `SourcePlatform`, `Auction`, `AuctionObservation`, `AuctionStatusHistory`, `ReceiverProcessingLog`.
+- [x] Утвердить опциональность `DomainPriceHistory` для MVP.
 
 ### 3.2 Реализация в `AppDbContext`
-- [ ] Добавить `DbSet` и конфигурации сущностей.
-- [ ] Настроить snake_case, схемы, фильтры, soft-delete совместимо с текущей базой.
-- [ ] Настроить связи и ограничения целостности.
+- [x] Добавить `DbSet` и конфигурации сущностей.
+- [x] Настроить snake_case, схемы, фильтры, soft-delete совместимо с текущей базой.
+- [x] Настроить связи и ограничения целостности.
 
 ### 3.3 Индексы и уникальность
-- [ ] Уникальность `Domain.NameNormalized`.
-- [ ] Уникальность `(SourcePlatformId, ExternalAuctionId)` для `Auction`.
-- [ ] Уникальность `AuctionObservation.MessageId`.
-- [ ] Индексы для `ObservedAt`, `Status`, `EndAt`, `NamePunycode`.
+- [x] Уникальность `Domain.NameNormalized`.
+- [x] Уникальность `(SourcePlatformId, ExternalAuctionId)` для `Auction`.
+- [x] Уникальность `AuctionObservation.MessageId`.
+- [x] Индексы для `ObservedAt`, `Status`, `EndAt`, `NamePunycode`.
 
 ### 3.4 IDN и нормализация доменов
-- [ ] Реализовать хранение original/normalized/punycode/tld/sld.
+- [x] Реализовать хранение original/normalized/punycode/tld/sld.
 - [ ] Подготовить тест-набор IDN кейсов.
 
 ### 3.5 Миграции

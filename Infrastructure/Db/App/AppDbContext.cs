@@ -28,6 +28,12 @@ public partial class AppDbContext : DbContext
 
     // Коллекции данных
     public DbSet<StatEventEntity> StatEvents => Set<StatEventEntity>();
+    public DbSet<DomainEntity> Domains => Set<DomainEntity>();
+    public DbSet<SourcePlatformEntity> SourcePlatforms => Set<SourcePlatformEntity>();
+    public DbSet<AuctionEntity> Auctions => Set<AuctionEntity>();
+    public DbSet<AuctionObservationEntity> AuctionObservations => Set<AuctionObservationEntity>();
+    public DbSet<AuctionStatusHistoryEntity> AuctionStatusHistory => Set<AuctionStatusHistoryEntity>();
+    public DbSet<ReceiverProcessingLogEntity> ReceiverProcessingLogs => Set<ReceiverProcessingLogEntity>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
