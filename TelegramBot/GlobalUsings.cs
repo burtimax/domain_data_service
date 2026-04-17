@@ -1,0 +1,1 @@
+﻿global using static TelegramBot.Resources.Localization.BotStrings;
