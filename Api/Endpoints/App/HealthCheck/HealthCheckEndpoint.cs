@@ -1,38 +1,84 @@
 ﻿using FastEndpoints;
+using Infrastructure.Db.App;
+using Microsoft.EntityFrameworkCore;
+using Api.Endpoints.App;
 
 namespace Api.Endpoints.App.HealthCheck;
 
-sealed class HealthCheckRequest
+class HealthCheckResponse
 {
-    public string? MockMessage { get; set; }
+    public string Status { get; set; } = string.Empty;
+    public DateTimeOffset UtcNow { get; set; }
 }
 
-sealed class HealthCheckResponse
+sealed class ReadinessResponse : HealthCheckResponse
 {
-    public string Result { get; set; }
+    public bool DatabaseReady { get; set; }
 }
 
-sealed class HealthCheckEndpoint : Endpoint<HealthCheckRequest, HealthCheckResponse>
+sealed class HealthCheckEndpoint : EndpointWithoutRequest<BaseResponse<HealthCheckResponse>>
 {
     public override void Configure()
     {
-        Post("health-check");
+        Get("health");
         AllowAnonymous();
         Group<AppGroupEndpoints>();
         Summary(s =>
         {
             s.Summary = "Проверка состояния приложения";
-            s.Description = $"Если вернула 200, значит приложение в рабочем состоянии. Иначе - ошибка работы приложения или недоступность приложения";
+            s.Description = "Liveness endpoint: процесс API запущен и отвечает.";
         });
     }
 
-    public override async Task HandleAsync(HealthCheckRequest r, CancellationToken c)
+    public override async Task HandleAsync(CancellationToken c)
     {
-        HealthCheckResponse response = new ()
+        var response = new HealthCheckResponse
         {
-            Result = "Приложение работоспособно"
+            Status = "healthy",
+            UtcNow = DateTimeOffset.UtcNow
         };
 
-        await SendAsync(response, cancellation: c);
+        await SendAsync(BaseResponse<HealthCheckResponse>.Ok(response), cancellation: c);
+    }
+}
+
+sealed class ReadinessEndpoint : EndpointWithoutRequest<BaseResponse<ReadinessResponse>>
+{
+    private readonly AppDbContext _dbContext;
+
+    public ReadinessEndpoint(AppDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
+    public override void Configure()
+    {
+        Get("readiness");
+        AllowAnonymous();
+        Group<AppGroupEndpoints>();
+        Summary(s =>
+        {
+            s.Summary = "Проверка готовности зависимостей";
+            s.Description = "Readiness endpoint: проверяет доступность БД для read API.";
+        });
+    }
+
+    public override async Task HandleAsync(CancellationToken c)
+    {
+        var dbReady = await _dbContext.Database.CanConnectAsync(c);
+        var payload = new ReadinessResponse
+        {
+            Status = dbReady ? "ready" : "not_ready",
+            UtcNow = DateTimeOffset.UtcNow,
+            DatabaseReady = dbReady
+        };
+
+        if (!dbReady)
+        {
+            await SendAsync(BaseResponse<ReadinessResponse>.Fail("База данных недоступна"), 503, c);
+            return;
+        }
+
+        await SendAsync(BaseResponse<ReadinessResponse>.Ok(payload), cancellation: c);
     }
 }

@@ -4,7 +4,6 @@ using FastEndpoints;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Shared.Contracts;
 
 namespace Api.Middleware;
 
@@ -69,17 +68,8 @@ public class ResponseExceptionMiddleware
             ? exception.ToString()
             : "Произошла внутренняя ошибка сервера. Пожалуйста, обратитесь к администратору.";
 
-        var errorDetail = _environment.IsDevelopment()
-            ? new
-            {
-                message = exception.Message,
-                stackTrace = exception.StackTrace,
-                innerException = exception.InnerException?.Message
-            }
-            : null;
-
         await context.Response.SendAsync(
-            Result.Failure(errorMessage),
+            BaseResponse<object>.Fail(errorMessage),
             StatusCodes.Status500InternalServerError);
     }
 }

@@ -4,6 +4,7 @@ using Application.Extensions;
 using Application.Services.StatEvent;
 using Infrastructure.Db.App;
 using Infrastructure.Db.App.Entities;
+using Infrastructure.Read;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +19,7 @@ public static class IServiceCollectionExtensions
     {
         // Receiver-only composition root.
         services.AddScoped<IStatEventService, StatEventService>();
+        services.AddScoped<IReceiverReadRepository, ReceiverReadRepository>();
         services.AddApplicationServices();
         services.AddHostedService<RabbitMqObservationConsumerService>();
     }

@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Application.Services.Ingestion;
+using Application.Services.Read;
 using Mapster;
 using MapsterMapper;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +12,7 @@ public static class IServiceCollectionExtensions
     public static void AddApplicationServices(this IServiceCollection services)
     {
         services.AddScoped<IObservationIngestionHandler, ObservationIngestionHandler>();
+        services.AddScoped<IReceiverReadService, ReceiverReadService>();
         services.AddSingleton<IngestionMetrics>();
     }
 
