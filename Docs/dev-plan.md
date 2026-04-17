@@ -142,30 +142,30 @@
 **Зависимость:** Epic 3 и Epic 4.
 
 ### 5.1 Validation
-- [ ] Schema validation.
-- [ ] Business validation.
+- [x] Schema validation.
+- [x] Business validation.
 
 ### 5.2 Dedupe / idempotency
-- [ ] Проверка duplicate по `MessageId`.
-- [ ] Проверка semantic duplicate по fingerprint.
-- [ ] Логирование решения dedupe в `ReceiverProcessingLog`.
+- [x] Проверка duplicate по `MessageId`.
+- [x] Проверка semantic duplicate по fingerprint.
+- [x] Логирование решения dedupe в `ReceiverProcessingLog`.
 
 ### 5.3 Normalization
-- [ ] Domain normalization.
-- [ ] Status normalization.
-- [ ] Currency/time normalization.
+- [x] Domain normalization.
+- [x] Status normalization.
+- [x] Currency/time normalization.
 
 ### 5.4 Matching + persistence
-- [ ] Match/Create `Domain`.
-- [ ] Match/Create `Auction`.
-- [ ] Update current snapshot `Auction`.
-- [ ] Append `AuctionObservation`.
-- [ ] Append `AuctionStatusHistory` (и `DomainPriceHistory`, если включено).
+- [x] Match/Create `Domain`.
+- [x] Match/Create `Auction`.
+- [x] Update current snapshot `Auction`.
+- [x] Append `AuctionObservation`.
+- [x] Append `AuctionStatusHistory` (и `DomainPriceHistory`, если включено).
 
 ### 5.5 Out-of-order и terminal rules
-- [ ] Приоритет terminal статусов.
-- [ ] Защита от поздних устаревших сообщений.
-- [ ] Корректная фиксация финального состояния.
+- [x] Приоритет terminal статусов.
+- [x] Защита от поздних устаревших сообщений.
+- [x] Корректная фиксация финального состояния.
 
 **DoD эпика:** pipeline receiver-а идемпотентен и устойчив к дублям/рассинхрону порядка.
 
