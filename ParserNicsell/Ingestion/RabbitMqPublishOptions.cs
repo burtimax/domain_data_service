@@ -1,6 +1,6 @@
-namespace ConsoleTest.RabbitMQTestObservations;
+namespace ParserNicsell.Ingestion;
 
-public sealed class RabbitMqTestOptions
+public sealed class RabbitMqPublishOptions
 {
     public string Host { get; set; } = "localhost";
     public int Port { get; set; } = 5672;
@@ -14,5 +14,7 @@ public sealed class RabbitMqTestOptions
     public string DlqExchange { get; set; } = "receiver.observations.dlx";
     public string DlqRoutingKey { get; set; } = "receiver.observation.v1.dlq";
     public bool DeclareTopologyBeforePublish { get; set; } = true;
-    public int MessagesCount { get; set; } = 10;
+
+    /// <summary>Задержка между сообщениями, мс (0 — без паузы).</summary>
+    public int PublishDelayMs { get; set; }
 }

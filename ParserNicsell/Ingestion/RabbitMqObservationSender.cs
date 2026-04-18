@@ -4,19 +4,19 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Exceptions;
 using Shared.Contracts.Ingestion;
 
-namespace ConsoleTest.RabbitMQTestObservations;
+namespace ParserNicsell.Ingestion;
 
-public sealed class RabbitMqObservationPublisher
+public sealed class RabbitMqObservationSender
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
-    private readonly RabbitMqTestOptions _options;
+    private readonly RabbitMqPublishOptions _options;
 
-    public RabbitMqObservationPublisher(RabbitMqTestOptions options)
+    public RabbitMqObservationSender(RabbitMqPublishOptions options)
     {
         _options = options;
     }
 
-    public async Task PublishAsync(IEnumerable<ObservationIngestionMessage> messages, CancellationToken ct)
+    public async Task SendAsync(IEnumerable<ObservationIngestionMessage> messages, CancellationToken ct)
     {
         var factory = new ConnectionFactory
         {
@@ -29,6 +29,7 @@ public sealed class RabbitMqObservationPublisher
 
         await using var connection = await factory.CreateConnectionAsync(ct);
         await using var channel = await connection.CreateChannelAsync(cancellationToken: ct);
+
         if (_options.DeclareTopologyBeforePublish)
         {
             await channel.ExchangeDeclareAsync(_options.Exchange, ExchangeType.Direct, durable: true, cancellationToken: ct);
@@ -52,6 +53,11 @@ public sealed class RabbitMqObservationPublisher
                 basicProperties: new BasicProperties { Persistent = true },
                 body: body,
                 cancellationToken: ct);
+
+            // if (_options.PublishDelayMs > 0)
+            // {
+            //     await Task.Delay(_options.PublishDelayMs, ct);
+            // }
         }
     }
 
@@ -64,7 +70,6 @@ public sealed class RabbitMqObservationPublisher
         }
         catch (OperationInterruptedException ex) when (ex.ShutdownReason?.ReplyCode == 404)
         {
-            // Queue does not exist yet: declare it with the same DLQ args as receiver.
         }
 
         var args = new Dictionary<string, object?>

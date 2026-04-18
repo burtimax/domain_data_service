@@ -1,18 +1,19 @@
 ﻿using ConsoleTest.RabbitMQTestObservations;
+using Microsoft.Extensions.Configuration;
 
-var options = new RabbitMqTestOptions
-{
-    Host =  "localhost",
-    // 5672 = AMQP (broker), 15672/15671 = management UI.
-    Port = 5672,
-    VirtualHost =  "/",
-    Username =  "tim",
-    Password = "123",
-    Exchange = "receiver.observations.exchange",
-    RoutingKey = "receiver.observation.v1",
-    MessagesCount =  10
-};
+var environment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ?? "Production";
 
+var configuration = new ConfigurationBuilder()
+    .SetBasePath(AppContext.BaseDirectory)
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables()
+    .Build();
+
+var options = new RabbitMqTestOptions();
+configuration.GetSection("RabbitMq").Bind(options);
+
+Console.WriteLine($"Конфигурация: окружение={environment}, RabbitMQ={options.Host}:{options.Port}, сообщений={options.MessagesCount}");
 Console.WriteLine("Starting RabbitMQ test observation scenario...");
 var runner = new RabbitMqObservationScenarioRunner(options);
 await runner.RunAsync(CancellationToken.None);

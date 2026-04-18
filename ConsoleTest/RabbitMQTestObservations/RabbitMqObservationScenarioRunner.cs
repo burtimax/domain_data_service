@@ -15,6 +15,6 @@ public sealed class RabbitMqObservationScenarioRunner
     {
         var messages = TestObservationFactory.Build(_options.MessagesCount);
         await _publisher.PublishAsync(messages, ct);
-        Console.WriteLine($"Published {messages.Count} test observation messages to {_options.Exchange}:{_options.RoutingKey}");
+        Console.WriteLine($"Published {messages.Count} test observation messages to {_options.Exchange}:{_options.RoutingKey} (queue: {_options.Queue})");
     }
 }
